@@ -1,0 +1,10 @@
+/* 예제 갤러리 강조색 */
+:root {
+  --accent: #7ee081;
+  --accent-ink: #062b0a;
+  --accent-soft: rgba(126, 224, 129, 0.14);
+}
+:root[data-theme='light'] {
+  --accent: #2f7d32;
+  --accent-soft: rgba(47, 125, 50, 0.1);
+}

@@ -1,0 +1,18 @@
+{
+  "name": "gallery-kit-example",
+  "version": "0.1.0",
+  "private": true,
+  "description": "kit 이 셸을 깨뜨리지 않았는지 보는 가장 작은 예제 갤러리. kit 의 node_modules 를 그대로 쓴다",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "check": "node ../tools/gallery.mjs check",
+    "thumbs": "node ../tools/gallery.mjs thumbs",
+    "skill": "node ../tools/gallery.mjs skill"
+  },
+  "gallery": {
+    "unityFolders": "unity/{id}",
+    "thumbTime": 0.5
+  }
+}

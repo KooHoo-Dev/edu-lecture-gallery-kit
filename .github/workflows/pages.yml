@@ -1,0 +1,64 @@
+# 갤러리 공통 배포 (재사용 워크플로). 갤러리 리포의 deploy.yml 이 부른다:
+#   jobs:
+#     pages:
+#       uses: KooHoo-Dev/edu-lecture-gallery-kit/.github/workflows/pages.yml@v0.1.0
+#       with: { release-name: PatternGallery, title: Pattern Gallery }
+# main 에 push → 빌드 · gallery check → GitHub Pages. v* 태그 → 오프라인용 단일 HTML 을 Release 에 첨부
+name: Gallery Pages
+
+on:
+  workflow_call:
+    inputs:
+      web:
+        description: Vite 앱 폴더 (리포 기준)
+        type: string
+        default: '.'
+      release-name:
+        description: Release 에 붙일 파일 이름 앞머리 (예 PatternGallery)
+        type: string
+        required: true
+      title:
+        description: Release 제목 앞머리 (예 Pattern Gallery)
+        type: string
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: ${{ inputs.web }}/package-lock.json
+      - run: npm ci
+        working-directory: ${{ inputs.web }}
+      - run: npm run build
+        working-directory: ${{ inputs.web }}
+      - name: 검사 (규격 · 무대 · 오프라인 실행 · 용량 · Skill)
+        run: node tools/gallery.mjs check --no-build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ inputs.web }}/dist
+      - name: Release 첨부 (태그일 때만)
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp "${{ inputs.web }}/dist/index.html" "${{ inputs.release-name }}-${GITHUB_REF_NAME}.html"
+          gh release create "$GITHUB_REF_NAME" "${{ inputs.release-name }}-${GITHUB_REF_NAME}.html" \
+            --title "${{ inputs.title }} $GITHUB_REF_NAME" \
+            --notes "오프라인용 HTML 파일 하나입니다. 내려받아 더블클릭하면 인터넷 없이 실행됩니다."
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

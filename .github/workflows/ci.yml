@@ -1,0 +1,23 @@
+# kit 검사: 타입 검사, 예제 갤러리 빌드와 gallery check (kit 변경이 셸을 깨뜨리지 않았는지)
+name: Kit CI
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run build
+        working-directory: example
+      - run: npm run check -- --no-build
+        working-directory: example

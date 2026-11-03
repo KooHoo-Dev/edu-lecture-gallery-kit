@@ -1,0 +1,102 @@
+import { useEffect, useState } from 'react'
+import { useGallery } from '../config'
+import { isTyping } from '../runtime/keys'
+import { load, save } from '../runtime/storage'
+import { About } from './About'
+import { EnvBadge } from './EnvBadge'
+import { ErrorBoundary } from './ErrorBoundary'
+import { Home } from './Home'
+import { useRoute } from './router'
+import { SpecimenPage } from './SpecimenPage'
+
+type Theme = 'dark' | 'light'
+
+export function App() {
+  const g = useGallery()
+  const route = useRoute(g.aliases)
+  const [theme, setTheme] = useState<Theme>(() =>
+    load<Theme>('theme', matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'),
+  )
+  // ?present=1 이면 발표 모드로 시작 (수업 자료 링크용)
+  const [presenter, setPresenter] = useState(() => /[?&]present=1\b/.test(location.hash))
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    save('theme', theme)
+  }, [theme])
+  useEffect(() => {
+    document.documentElement.dataset.presenter = String(presenter)
+  }, [presenter])
+  useEffect(() => {
+    document.title = g.name
+  }, [g.name])
+
+  // P: 발표 모드, Esc: 해제 (입력창에서는 무시)
+  useEffect(() => {
+    const on = (e: KeyboardEvent) => {
+      if (isTyping(e) || e.ctrlKey || e.metaKey || e.altKey) return
+      // e.key 는 한글 입력 상태에서 'Process' 가 되므로 키 위치(e.code)로 판단한다
+      if (e.code === 'KeyP') setPresenter(v => !v)
+      if (e.key === 'Escape') setPresenter(false)
+    }
+    addEventListener('keydown', on)
+    return () => removeEventListener('keydown', on)
+  }, [])
+
+  const isFile = location.protocol === 'file:'
+
+  return (
+    <div className="app">
+      <a className="skip-link" href="#main">본문으로 건너뛰기</a>
+      <header className="topbar">
+        <a className="brand" href="#/" aria-label={`${g.name} 홈`}>
+          <span className="brand-mark" aria-hidden />
+          <span className="brand-text">
+            <b>{g.brand.title}</b>
+            <small>{g.brand.tagline}</small>
+          </span>
+        </a>
+        <nav className="topnav" aria-label="주 메뉴">
+          <a href="#/" aria-current={route.name === 'home' ? 'page' : undefined}>갤러리</a>
+          <a href="#/about" aria-current={route.name === 'about' ? 'page' : undefined}>크레딧 · 정책</a>
+        </nav>
+        <div className="topbar-tools">
+          <EnvBadge />
+          {!isFile && (
+            <a className="btn btn-ghost" href="./index.html" download={g.downloadName} title="이 갤러리 전체를 HTML 파일 하나로 내려받아 인터넷 없이 실행">
+              오프라인용 HTML 받기
+            </a>
+          )}
+          <button className="btn btn-ghost hide-sm" onClick={() => setPresenter(v => !v)} aria-pressed={presenter} title="발표 모드 (P)">
+            발표 모드 <kbd>P</kbd>
+          </button>
+          <button
+            className="btn btn-icon"
+            onClick={() => setTheme(t => (t === 'dark' ? 'light' : 'dark'))}
+            aria-label={theme === 'dark' ? '밝은 테마로' : '어두운 테마로'}
+            title="테마 전환"
+          >
+            {theme === 'dark' ? '☀' : '☾'}
+          </button>
+        </div>
+      </header>
+
+      <main id="main" className="main" tabIndex={-1}>
+        {route.name === 'home' && <Home />}
+        {route.name === 'specimen' && (
+          <ErrorBoundary key={`${route.id}?${route.query}`} label="이 표본" gallery={g.name}>
+            <SpecimenPage id={route.id} presetId={route.preset} opts={route.opts} presenter={presenter} />
+          </ErrorBoundary>
+        )}
+        {route.name === 'about' && <About />}
+      </main>
+
+      <footer className="footer">
+        <p>{g.footer} 게임명과 상표는 각 권리자의 소유입니다.</p>
+        <p className="footer-meta">
+          v{__APP_VERSION__} · {__BUILD_DATE__} · {g.envLabel} · <a href="#/about">크레딧 · 라이선스</a>
+        </p>
+      </footer>
+    </div>
+  )
+}

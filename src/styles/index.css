@@ -1,0 +1,4 @@
+/* kit 공통 스타일. 갤러리는 자기 theme.css 에서 --accent 등을 덮어쓴다 */
+@import './fonts.css';
+@import './tokens.css';
+@import './app.css';
