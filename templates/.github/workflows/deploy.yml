@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   pages:
-    uses: KooHoo-Dev/edu-lecture-gallery-kit/.github/workflows/pages.yml@v0.1.0
+    uses: KooHoo-Dev/edu-lecture-gallery-kit/.github/workflows/pages.yml@v0.1.1
     with:
       release-name: PatternGallery
       title: Pattern Gallery

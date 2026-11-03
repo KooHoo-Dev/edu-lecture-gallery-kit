@@ -1,7 +1,7 @@
 # 갤러리 공통 배포 (재사용 워크플로). 갤러리 리포의 deploy.yml 이 부른다:
 #   jobs:
 #     pages:
-#       uses: KooHoo-Dev/edu-lecture-gallery-kit/.github/workflows/pages.yml@v0.1.0
+#       uses: KooHoo-Dev/edu-lecture-gallery-kit/.github/workflows/pages.yml@v0.1.1
 #       with: { release-name: PatternGallery, title: Pattern Gallery }
 # main 에 push → 빌드 · gallery check → GitHub Pages. v* 태그 → 오프라인용 단일 HTML 을 Release 에 첨부
 name: Gallery Pages

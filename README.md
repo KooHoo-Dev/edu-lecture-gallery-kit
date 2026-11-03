@@ -13,7 +13,7 @@
 ## 갤러리에서 쓰기
 
 ```json
-"dependencies": { "@koohoo/gallery-kit": "github:KooHoo-Dev/edu-lecture-gallery-kit#v0.1.0" }
+"dependencies": { "@koohoo/gallery-kit": "github:KooHoo-Dev/edu-lecture-gallery-kit#v0.1.1" }
 ```
 
 - `vite.config.ts`: `export default defineConfig(galleryVite())` (`@koohoo/gallery-kit/vite`)

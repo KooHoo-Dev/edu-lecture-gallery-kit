@@ -35,11 +35,14 @@ export class TrackPlayer {
   private fireClock = new Map<string, number>()
   private liveKeys = new Set<string>()
 
+  private meta: BaseMeta
+  private onFire?: (eventId: string) => void
+
   /** onFire: 트랙이 없는 이벤트도 포함해 이벤트가 일어날 때마다 (무대가 직접 처리할 때) */
-  constructor(
-    private meta: BaseMeta,
-    private onFire?: (eventId: string) => void,
-  ) {}
+  constructor(meta: BaseMeta, onFire?: (eventId: string) => void) {
+    this.meta = meta
+    this.onFire = onFire
+  }
 
   reset(time = 0) {
     this.time = time

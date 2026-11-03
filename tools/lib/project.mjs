@@ -6,6 +6,8 @@
 //   budget       { raw, gzip } 바이트 (기본 5MB, 1.5MB)
 //   perSpecimenGzip  표본 하나의 gzip 증분 기준 (기본 45KB)
 //   thumbTime    썸네일을 찍을 무대 시간 (초, 기본 1)
+//   thumbQuery   썸네일 링크 옵션 (기본 "auto=0". 입력이 있어야 보이는 갤러리는 "auto=1" 로 자동 데모를 그 시간까지 돌린다)
+//   checkQuery   무대 검사 링크 옵션 (기본 "auto=0")
 //   unityFolders 표본의 Unity 코드 폴더 (리포 기준, {id} 자리, 예 "unity/{id}")
 //   domainCheck  도메인 검사 모듈 (리포 기준, 예 "tools/check-domain.mjs")
 
@@ -32,6 +34,8 @@ export function project(root = process.cwd()) {
     budget: { raw: g.budget?.raw ?? 5 * 1024 * 1024, gzip: g.budget?.gzip ?? 1.5 * 1024 * 1024 },
     perSpecimenGzip: g.perSpecimenGzip ?? 45 * 1024,
     thumbTime: g.thumbTime ?? 1,
+    thumbQuery: g.thumbQuery ?? 'auto=0',
+    checkQuery: g.checkQuery ?? 'auto=0',
     unityFolders: g.unityFolders ?? null,
     domainCheck: g.domainCheck ? join(root, g.domainCheck) : null,
     out: join(root, '_shots'),

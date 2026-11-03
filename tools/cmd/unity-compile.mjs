@@ -7,7 +7,7 @@
 // 한계: 컴파일만 본다. UXML·USS 임포트와 장면 동작은 에디터로 확인한다.
 
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { isAbsolute, join } from 'node:path'
 import { project, specimenIds } from '../lib/project.mjs'
@@ -43,7 +43,8 @@ export default async function unityCompile(args) {
   const analyzers = [...csproj.matchAll(/<Analyzer Include="([^"]+)"/g)].map(m => abs(m[1]))
   const defines = [...csproj.matchAll(/<DefineConstants>([^<]*)<\/DefineConstants>/g)].map(m => m[1]).join(';')
   const files = folders.flatMap(walk)
-  const out = join(tmpdir(), 'gallery-unity-compile')
+  // 프로세스마다 다른 폴더 (워커 여럿이 동시에 돌려도 Check.dll 이 부딪치지 않게)
+  const out = join(tmpdir(), `gallery-unity-compile-${process.pid}`)
   mkdirSync(out, { recursive: true })
   const q = s => `"${s}"`
   const rsp = [
@@ -70,6 +71,7 @@ export default async function unityCompile(args) {
     .filter(l => l && !/CS2023|USG0001/.test(l))
     .map(l => l.replaceAll(`${p.root}\\`, ''))
   if (lines.length) console.log(lines.join('\n'))
+  rmSync(out, { recursive: true, force: true })
   console.log(r.status === 0 ? '통과' : `실패 (exit ${r.status})`)
   process.exitCode = r.status === 0 ? 0 : 1
 }

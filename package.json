@@ -1,6 +1,6 @@
 {
   "name": "@koohoo/gallery-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "교안 갤러리 공통 틀: 앱 셸, 표본 계약, AI 지시 세트·Skill, 검사·캡처 도구 (유니티 개발자 양성과정)",
   "license": "MIT",
   "type": "module",

@@ -1,7 +1,7 @@
 // gallery thumbs: 웹 무대를 찍어 썸네일과 AI 세트 이미지로 둔다 (Unity 촬영이 없는 갤러리용).
 //   gallery thumbs              모든 표본
 //   gallery thumbs <id> ...     지정한 표본
-// 무대 시간을 thumbTime(기본 1초)에 멈추고 자동 데모를 끈 화면을 찍는다.
+// 무대 시간을 thumbTime(기본 1초)에 멈춘 화면을 찍는다. 링크 옵션은 thumbQuery (기본 자동 데모 끔).
 // 결과: <shots>/<id>/default.webp 와 meta.captures 마다 <name>.webp (폭 720)
 
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -38,7 +38,7 @@ export default async function thumbs(args) {
         const dir = join(p.shotsDir, id)
         mkdirSync(dir, { recursive: true })
         for (const s of shots) {
-          await page.goto(`${url}#/s/${id}?auto=0&t=${p.thumbTime}${s.query}`)
+          await page.goto(`${url}#/s/${id}?${p.thumbQuery}&t=${p.thumbTime}${s.query}`)
           await page.sleep(500)
           await settle(page, 0)
           // 무대 위 상태 배지(일시정지)는 썸네일에 넣지 않는다

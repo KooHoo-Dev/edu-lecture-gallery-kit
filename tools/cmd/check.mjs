@@ -166,7 +166,7 @@ async function checkPage(p, html, ids, all, r, { full, links }) {
       for (const id of ids) {
         const meta = metas[id]
         if (!meta) continue
-        await checkStage(page, url, id, meta, t, r)
+        await checkStage(page, url, id, meta, t, p.checkQuery, r)
         console.log(`  ${id}: 무대 검사 끝`)
       }
 
@@ -193,8 +193,8 @@ async function stageShot(page) {
   return rect ? page.screenshot(rect) : null
 }
 
-async function checkStage(page, url, id, meta, t, r) {
-  const base = `auto=0&t=${t}`
+async function checkStage(page, url, id, meta, t, query, r) {
+  const base = `${query}&t=${t}`
   const failed = await open(page, url, id, base)
   if (failed) return r.err(`${id}: 표본을 표시하지 못함: ${failed.slice(0, 300)}`)
   const status = await page.evaluate('window.__gallery.stage()')
